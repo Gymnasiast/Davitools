@@ -9,6 +9,10 @@ if ($argc < 3)
 $indexFilename = $argv[1];
 $imageFilename = $argv[2];
 $outputDirectory = rtrim($argv[3], '/');
+if (!file_exists($outputDirectory))
+{
+    @mkdir($outputDirectory, 0777, true);
+}
 
 $indexFileHandle = fopen($indexFilename, 'rb');
 $imageFileHandle = fopen($imageFilename, 'rb');
