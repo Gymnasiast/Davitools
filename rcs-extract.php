@@ -1,6 +1,6 @@
 #!/usr/bin/env php
 <?php
-if ($argc < 3)
+if ($argc < 4)
 {
     printf("Usage: rcs-extract.php <index file> <image file> <output directory>\n");
     die();
