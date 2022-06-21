@@ -1,5 +1,9 @@
 #!/usr/bin/env php
 <?php
+require __DIR__ . '/src/RCS/Entry.php';
+
+use Davitools\RCS\Entry;
+
 if ($argc < 4)
 {
     printf("Usage: rcs-extract.php <index file> <image file> <output directory>\n");
@@ -17,6 +21,7 @@ if (!file_exists($outputDirectory))
 $indexFileHandle = fopen($indexFilename, 'rb');
 $imageFileHandle = fopen($imageFilename, 'rb');
 
+/** @var Entry[] $indices */
 $indices = [];
 
 $numFiles = unpack('v', fread($indexFileHandle, 2))[1];
@@ -36,14 +41,14 @@ for ($i = 0; $i < $numFiles; $i++)
 
     printf('File %d: "%s", offset %d' . PHP_EOL, $i, $filename, $offset);
 
-    $indices[$i] = ['filename' => $filename, 'offset' => $offset];
+    $indices[$i] = new Entry($filename, $offset);
 }
 // To allow i + 1
-$indices[$numFiles] = ['filename' => '', 'offset' => filesize($imageFilename)];
+$indices[$numFiles] = new Entry('', filesize($imageFilename));
 
 for ($i = 0; $i < $numFiles; $i++)
 {
-    $size = $indices[$i + 1]['offset'] - $indices[$i]['offset'];
+    $size = $indices[$i + 1]->offset - $indices[$i]->offset;
     assert($size >= 0);
     if ($size === 0)
     {
@@ -53,8 +58,8 @@ for ($i = 0; $i < $numFiles; $i++)
     {
         $contents = fread($imageFileHandle, $size);
     }
-    echo $indices[$i]['filename'];
-    file_put_contents($outputDirectory . '/' . $indices[$i]['filename'], $contents);
+    echo $indices[$i]->filename;
+    file_put_contents($outputDirectory . '/' . $indices[$i]->filename, $contents);
     echo PHP_EOL;
 }
 
